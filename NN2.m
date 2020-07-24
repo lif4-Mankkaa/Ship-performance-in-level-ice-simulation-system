@@ -1,0 +1,76 @@
+function [y1] = NN2(x1)
+% Neural network simulation function for stress calculation
+%
+% ALL PARAMETERS ARE NON-DIMENSIONAL
+%
+% [y1] = NN2(x1) takes these arguments:
+%   x = Qx5 matrix, input #1, sequence of inputs: [theta (deg), b/lc, c/lc, mu1,mu2]
+% and returns:
+%   y = Qx1 matrix, output #1, y = lb/lc
+% where Q is the number of samples.
+% 
+
+%#ok<*RPMT0>
+lc = (50e6*0.03^3/(12*0.91*1025*9.81))^0.25*1000;
+x1(2:3) = x1(2:3)*lc;
+x1(4:5) = x1(4:5)*1000;
+
+% ===== NEURAL NETWORK CONSTANTS =====
+
+% Input 1
+x1_step1.xoffset = [10;6;15;50;50];
+x1_step1.gain = [0.0133333333333333;0.00336700336700337;0.00493827160493827;0.0133333333333333;0.0133333333333333];
+x1_step1.ymin = -1;
+
+% Layer 1
+b1 = [11.3490595969674;6.44455046740020;17.1888996550263;-4.31854981689856;-0.152624128442712;-18.0447188720373;-6.54446380712571;-9.55575869151629;0.173100829342580;-22.7651069205665];
+IW1_1 = [-0.247910682505282,10.7685386524761,0.732170673532593,0.334717637650697,0.0933824806952717;-0.108874205620732,6.30024109531869,0.522179226828566,0.182551958551710,0.0525468142647213;0.937191538792421,16.2502979925488,1.11592334105486,1.96780840424351,0.342743196613635;-2.37187695778056,-7.01161371545496,-0.710283936292744,0.0542648226948482,-0.0205129546811940;-0.447643911028003,-0.0983052963235665,0.105862206545594,0.0933946863337815,0.0235408301553240;-0.949314113526701,-17.1081893187297,-1.13426739504361,-1.98669501406079,-0.346620761787535;0.0629468553036850,-6.72558929125250,-0.540051064383162,-0.193605220231732,-0.0534114365606835;-0.882736228949837,0.595641162829905,-8.69049551513855,0.144403818542235,0.447297869009843;0.402302176508973,0.0805613637868660,-0.250234057189589,-0.0729592291156872,-0.0186515866219504;-0.670238896724762,-23.6914009895506,-0.600569057341748,-0.385898968776939,-0.149769710996946];
+% Layer 2
+b2 = 1.10332615959934;
+LW2_1 = [3.20961209406506,-10.4657755717416,-7.47680331141210,-0.107186889845442,-3.68386003843570,-7.36610679150017,-6.77860062217783,-0.161982818759752,-3.97898812939017,0.516761844779098];
+
+% Output 1
+y1_step1.ymin = -1;
+y1_step1.gain = 0.00318876065960585;
+y1_step1.xoffset = 38.0298346169713;
+
+% ===== SIMULATION ========
+
+% Dimensions
+Q = size(x1,1); % samples
+
+% Input 1
+x1 = x1';
+xp1 = mapminmax_apply(x1,x1_step1);
+
+% Layer 1
+a1 = tansig_apply(repmat(b1,1,Q) + IW1_1*xp1);
+
+% Layer 2
+a2 = repmat(b2,1,Q) + LW2_1*a1;
+
+% Output 1
+y1 = mapminmax_reverse(a2,y1_step1);
+y1 = y1'/lc;
+end
+
+% ===== MODULE FUNCTIONS ========
+
+% Map Minimum and Maximum Input Processing Function
+function y = mapminmax_apply(x,settings)
+y = bsxfun(@minus,x,settings.xoffset);
+y = bsxfun(@times,y,settings.gain);
+y = bsxfun(@plus,y,settings.ymin);
+end
+
+% Sigmoid Symmetric Transfer Function
+function a = tansig_apply(n,~)
+a = 2 ./ (1 + exp(-2*n)) - 1;
+end
+
+% Map Minimum and Maximum Output Reverse-Processing Function
+function x = mapminmax_reverse(y,settings)
+x = bsxfun(@minus,y,settings.ymin);
+x = bsxfun(@rdivide,x,settings.gain);
+x = bsxfun(@plus,x,settings.xoffset);
+end
