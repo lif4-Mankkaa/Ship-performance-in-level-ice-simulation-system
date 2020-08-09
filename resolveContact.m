@@ -567,7 +567,8 @@ for i = 1:length(R)
                     db = dbdb.DB0;
                     comparedata = db(thetaInd).stress(angleInd,:);
                     comparedataH = db(thetaInd).stressH(angleInd,:);
-                    rbreak_ind = find((comparedata*SF(i)+comparedataH*SF_H(i))/rf(i)<sigmaf(i));
+                    len = min(length(comparedata),length(comparedataH));
+                    rbreak_ind = find((comparedata(1:len)*SF(i)+comparedataH(1:len)*SF_H(i))/rf(i)<sigmaf(i));
                     comparedata(isnan(comparedata))=[];
                     DBcolumeInd = min(length(rbreak_ind)+1,length(comparedata));
                 end

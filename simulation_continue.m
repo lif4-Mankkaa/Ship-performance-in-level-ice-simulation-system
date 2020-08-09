@@ -83,7 +83,7 @@ while t < tend-0.0001 && rk(1) + ship.L < length(iceField.h(1,:))+ship.L*3
     TM(1:2,1:2) = [cos(psi0) -sin(psi0); sin(psi0) cos(psi0)]; 
     ri0 = rk + TM*(vk*dt + 0.5*ak*dt^2);
     vi0 = vk + ak*dt;
-    rudderang = rudderangle - atand( (vi0(2)-vi0(4)*ship.rudpos(1))/vi0(1) );
+    rudderang = rudderangle - atand( (vi0(2)+vi0(4)*ship.rudpos(1))/vi0(1) );
     % ----------------------------------------------------------------------------------------------- %
     % Ice forces
     % Ridge resistance by Malmberg's method
@@ -117,7 +117,7 @@ while t < tend-0.0001 && rk(1) + ship.L < length(iceField.h(1,:))+ship.L*3
 %     Fxz = (Fmid/mu+Fbow_buo/tand(ship.phib*2)) * (1 + 9.4 * norm(vi0(1:2))/sqrt(9.81*ship.L));
     Rs = [Fxs Fxy Fxy*0.5*ship.T Fxy*0.25*ship.L]';
     %rudder force
-    Fr = 2*rudderforce(ship.Rasp,rudderang,ship.chord,vi0(1),ship.Ar,-ship.rudpos, 0.15, ship.Kr, Ft(1)/2, ship.dprop);
+    Fr = 2*rudderforce(ship.Rasp,rudderang,ship.chord,vi0(1),ship.Ar,ship.rudpos, 0.15, ship.Kr, Ft(1)/2, ship.dprop);
     F_nonlin = [M(1,1)*vi0(2)*vi0(4),-M(2,2)*vi0(1)*vi0(4),0,0]';
     Fboy = [0 0 -ship.GMroll*ri0(3)*ship.M(1,1)*9.8 0]';
     F0 = Fi0 + Ft + Rs + Fr + Fboy + F_rotate + F_nonlin;

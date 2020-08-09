@@ -1,4 +1,4 @@
-function [ ship ] = hull_teho( x_frame, halfWidth, x_phi, phiIn, vinit, scale, T, zCOG)
+function [ ship ] = hull_teho( x_frame, halfWidth, x_phi, phiIn, scale, T, zCOG, m, Ixx, Izz, alpha, phib)
 %Definition of the data struct "ship".
 %   Defines the discretised hull polygon based on frame spacing and half
 %   widths. Flare angles are also determined based on a waterline below the
@@ -75,35 +75,27 @@ end
 %directional angles of the tangents
 dirAng = atan(k);
 
-m = 12500e3/scale^3;
-Ixx = 1.77e7/scale^5;
-% Iyy = 1.77e10/scale^5;
-Izz = 1.33e10/scale^5;
-
 ship.x = single(x_flot);
 ship.y = single(y_flot);
 ship.phi = phi;
 ship.dphi_over_dx = dphi_over_dx;
 ship.d2phi_over_dx2 = d2phi_over_dx2;
-ship.vcog = [vinit 0 0 0]';
-ship.rcog = [-100/scale 100 0 0]';
-ship.vow = 9/scale^0.5;
+
 ship.M = [m 0 0 0;0 m 0 0;0 0 Ixx 0;0 0 0 Izz];
 ship.F0 = [0 0 0 0]';
 %Stability
-ship.GMroll = 1.35/scale;
 % ship.GMpitch = 45/scale;
 
 ship.L = max(ship.x)-min(ship.x);
-ship.B = max(ship.y) -min(ship.y);
+ship.B = max(ship.y)-min(ship.y);
 ship.T = T/scale;
 ship.zarm = (ship.T-zCOG)/scale; % vertical distance of gravity center to water surface
 ship.Cb = (m/1024)/(ship.L*ship.B*ship.T);
-ship.alpha = 33;
+ship.alpha = alpha;
 ship.tanalpha = tand(33);
 ship.sinalpha = sind(33);
 ship.cosalpha = cosd(33);
-ship.phib = 20;
+ship.phib = phib;
 ship.tanphi = tand(20);
 ship.sinphi = sind(20);
 ship.cosphi = cosd(20);
@@ -111,7 +103,7 @@ ship.psi = atand(tand(ship.phib)/sind(ship.alpha));
 ship.tanpsi = tand(ship.psi);
 ship.sinpsi = sind(ship.psi);
 ship.cospsi = cosd(ship.psi);
-%ship.w = 0.2;%TÄM?IHAN HATUSTA
+ship.w = 0.2;%TÄM?IHAN HATUSTA
 ship.delta = 0;
 
 %ship sections

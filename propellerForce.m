@@ -3,6 +3,9 @@ function [ propForce ] = propellerForce( v, ship, pp_D, power_t, prop_type )
 %pp_D: propeller pitch to diameter ratio, if fixed pitch, pp_D=0
 %power_t: ship power to propeller at time t
 %prop_type: blade area ratio, 70, 85 or 100
+K_ref = -0.5848*ship.refpitch+3.349;
+Ke_ref = (0.250/pi^2)^(1/3)*K_ref;
+refbollard = 2*Ke_ref*(1/2*ship.refpower*ship.dprop)^(2/3)*1e3;
 
 if prop_type == 70
     C_ita = [-0.3742 1.054 -0.003];
@@ -27,9 +30,9 @@ itaratio = (pp_D == 0)*1 + (pp_D ~= 0)*ita/itaref;
 vow = (powerratio*itaratio)^0.3064*ship.vow;
 if pp_D ~= 0
     bollard = powerratio^0.6666*(C_ke(1)*pp_D+C_ke(2))/(C_ke(1)*ship.refpitch+...
-        C_ke(2))*ship.bollard;
+        C_ke(2))*refbollard;
 else
-    bollard = powerratio^0.6666*ship.bollard;
+    bollard = powerratio^0.6666*refbollard;
 end
 
 if 0 <= v(1) && v(1) < vow
