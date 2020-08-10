@@ -16,13 +16,13 @@ Izz = 1.33e10;
 
 [ship] = hull_teho(x_f, y_f, x_phi, phiIn, 1, T, zCOG, m, Ixx, Izz, alpha, phib);
 ship.name = 'Agu'; % Name of the ship
+ship.GMroll = 1.35;
 
 % Propulsion
 ship.dprop = 4.5; % propeller diameter, m
 ship.fullpower = 9000; % Full power, kW
 ship.fullpitch = 1.14; % Max propeller pitch to diameter ratio (p/D)
 ship.vow = 9;
-ship.GMroll = 1.35;
 
 % A reference point of ship power, propeller p/D and speed
 ship.refpower = 8820; % Reference power

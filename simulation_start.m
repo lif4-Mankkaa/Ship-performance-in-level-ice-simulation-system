@@ -1,5 +1,5 @@
 function [results, ship, iceField, normalLoads ] = simulation_start(tspan, ship, iceField, dt, lin, ...
-    power, Thrust, prop_pitch, DB, scale,areacorr )
+    power, Thrust, prop_pitch, DB, scale,areacorr,ax )
 warning('off','all')
 %Numerical simulation of ship operating in a level ice field
 %definition of structs 'ship' and 'iceField'
@@ -139,20 +139,22 @@ while rk(1) - ship.rcog(1) < 150
         nLnext = nLend + 1;
     end
     t = t+dt;
-    if floor(5*t)-floor(5*(t-dt))==1
-        plot(iceField.x,iceField.y,ship.x,ship.y)
-        xlim([-100 100]/scale)
-        ylim([-50 50]/scale)
-        title(num2str(t))
-        hold on
+    if floor(10*t)-floor(10*(t-dt))==1        
+%         plot(ax,iceField.x,iceField.y,ship.x,ship.y)
+        plot(ax,iceField.x,iceField.y,'k')
+        hold(ax,'on');
+        fill(ax,ship.x,ship.y,'b')
+        xlim(ax,[-100 100]/scale)
+        ylim(ax,[-50 50]/scale)
+        title(ax,['Warmup, t=',num2str(t),'s'])      
         if isfield(iceField.icepiece,'loc')
             ind_rot_active =  iceField.icepiece.IndRot == 1;
-            scatter(iceField.icepiece.loc(ind_rot_active,1),iceField.icepiece.loc(ind_rot_active,2),'MarkerEdgeColor','r','MarkerFaceColor','r')
+            scatter(ax,iceField.icepiece.loc(ind_rot_active,1),iceField.icepiece.loc(ind_rot_active,2),'MarkerEdgeColor','r','MarkerFaceColor','r')
             ind_rot_inactive =  iceField.icepiece.IndRot == 0;
-            scatter(iceField.icepiece.loc(ind_rot_inactive,1),iceField.icepiece.loc(ind_rot_inactive,2),'MarkerEdgeColor','k','MarkerFaceColor','k')
+            scatter(ax,iceField.icepiece.loc(ind_rot_inactive,1),iceField.icepiece.loc(ind_rot_inactive,2),'MarkerEdgeColor','k','MarkerFaceColor','k')
         end
         pause(0.001)
-        hold off
+        hold(ax,'off');
     end
     
     results(counter,:) = [t rk(1) rk(2) rk(3) rk(4) vk(1) vk(2) vk(3) vk(4) ak(1) ak(2) ak(3) ak(4) ...

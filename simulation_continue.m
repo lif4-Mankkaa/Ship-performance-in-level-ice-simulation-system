@@ -1,5 +1,5 @@
 function [results, ship, iceField, normalLoads ] = ...
-    simulation_continue(iceField,initial,tspan,ship,dt,power,Thrust,prop_pitch,lin,DB,vl,vr,icecondition,operationmode,scale,areacorr,rdag)
+    simulation_continue(iceField,initial,tspan,ship,dt,power,Thrust,prop_pitch,lin,DB,vl,vr,icecondition,operationmode,scale,areacorr,rdag,ax)
 warning('off','all')
 %Numerical simulation of ship operating in a level ice field
 %definition of structs 'ship' and 'iceField'
@@ -161,23 +161,25 @@ while t < tend-0.0001 && rk(1) + ship.L < length(iceField.h(1,:))+ship.L*3
         nLnext = nLend + 1;
     end
     t = t+dt;
-    if floor(50*t)-floor(50*(t-dt))==1
-        plot(iceField.x,iceField.y,ship.x,ship.y)
-        xlim([-100 100]/scale)
-        ylim([-50 50]/scale)
-        title(num2str(t))
+    if floor(10*t)-floor(10*(t-dt))==1
+%         plot(ax,iceField.x,iceField.y,ship.x,ship.y)
+        plot(ax,iceField.x,iceField.y,'k')
+        hold(ax,'on');
+        fill(ax,ship.x,ship.y,'b')
+        xlim(ax,[-100 100]/scale)
+        ylim(ax,[-50 50]/scale)
+        title(ax,['Simulating, t=',num2str(t),'s'])   
         vk(4)
         ri(3:4)
 %         F_rot_acc = F_rot_acc+F_rotate(4)
-        hold on
         if isfield(iceField,'icepiece')
             ind_rot_active =  iceField.icepiece.IndRot == 1;
-            scatter(iceField.icepiece.loc(ind_rot_active,1),iceField.icepiece.loc(ind_rot_active,2),'MarkerEdgeColor','r','MarkerFaceColor','r')
+            scatter(ax,iceField.icepiece.loc(ind_rot_active,1),iceField.icepiece.loc(ind_rot_active,2),'MarkerEdgeColor','r','MarkerFaceColor','r')
             ind_rot_inactive =  iceField.icepiece.IndRot == 0;
-            scatter(iceField.icepiece.loc(ind_rot_inactive,1),iceField.icepiece.loc(ind_rot_inactive,2),'MarkerEdgeColor','k','MarkerFaceColor','k')
+            scatter(ax,iceField.icepiece.loc(ind_rot_inactive,1),iceField.icepiece.loc(ind_rot_inactive,2),'MarkerEdgeColor','k','MarkerFaceColor','k')
         end
         pause(0.001)
-        hold off
+        hold(ax,'off');
     end
     
     if abs(t - 76.65) < 0.0002

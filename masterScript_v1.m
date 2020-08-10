@@ -1,4 +1,4 @@
-function masterScript_v1(ship,iceField,h,dis,operationmode,icecondition,v_chan,scale,power,prop_pitch,Thrust,vinit,rdag)
+function masterScript_v1(ship,iceField,h,dis,operationmode,icecondition,v_chan,scale,power,prop_pitch,Thrust,vinit,rdag,ax)
 
 %the script is originally coded by Lauri Kuuliala. Fang Li modified this
 %script by fixing some errors which could lead to unstable behavior,
@@ -70,7 +70,7 @@ parameters = h*100;
     %calls simulation code
 disp('Warmup starts')
 [res, Ship, ice, ~] = simulation_start([0 3], ship, iceField, ...
-   0.01, lin, power, Thrust, prop_pitch, DB, scale,areacorr);
+   0.01, lin, power, Thrust, prop_pitch, DB, scale,areacorr,ax);
 
 %this part has to do with memory management and saving intermediate
 %results
@@ -109,7 +109,7 @@ while i < 160
        %debug
        %TT = [132.3,132.5];
        [res2, Ship, ice, nLoads] = simulation_continue(ice, res(end,:), ...
-           TT, Ship, dt, power,Thrust,prop_pitch, lin, DB,vl,vr,icecondition, operationmode,scale,areacorr,rdag);
+           TT, Ship, dt, power,Thrust,prop_pitch, lin, DB,vl,vr,icecondition, operationmode,scale,areacorr,rdag,ax);
 
        res = vertcat(res,res2(2:end,:));
 %        rowInd = find(nLoads(6:end,1)==0,1);
